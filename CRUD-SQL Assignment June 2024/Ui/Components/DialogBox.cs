@@ -9,7 +9,7 @@ namespace CRUD_SQL_Assignment_June_2024
 {
     internal class DialogBox : Box, IHasDimensions, IHasPosition
     {
-        public DialogBox(Dimensions dim, Position pos, Alignment? align, string text, List<string> labelsInput, List<string> labelsComboBox, List<string> options)
+        public DialogBox(Dimensions dim, Position pos, Alignment? align, string text, List<string> labelsInput)
             : base(dim, pos)
         {
             // -- DialogBox Border
@@ -39,13 +39,11 @@ namespace CRUD_SQL_Assignment_June_2024
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
             List<string> combinedLabels = new(labelsInput);
-            combinedLabels.AddRange(labelsComboBox);
             LabelFieldGroup labelFields = new(
                 pos: labelGroupStartPos,
                 dim: labelFieldDim,
                 spacing: Margins.BorderVerticalMarginDouble,
                 inputFields: labelsInput.Count,
-                comboBoxes: labelsComboBox.Count,
                 labels: combinedLabels);
             Position nextStartPosLabelFields = labelFields.GetNextStartPosition();
 
@@ -93,7 +91,7 @@ namespace CRUD_SQL_Assignment_June_2024
             Position nextStartPosInputFields = inputFields.GetNextStartPosition();
 
             // -- ComboBox Group
-            Position comboBoxPos = new(
+            /*Position comboBoxPos = new(
                     nextStartPosInputFields.Left,
                     nextStartPosInputFields.Top);
             Dimensions comboBoxDim = new(
@@ -105,7 +103,7 @@ namespace CRUD_SQL_Assignment_June_2024
                 labels: labelsComboBox,
                 options: options,
                 spacing: Margins.BorderVerticalMarginDouble);
-            Position nextStartPosComboBoxes = comboBoxes.GetNextStartPosition();
+            Position nextStartPosComboBoxes = comboBoxes.GetNextStartPosition();*/
         }
 
         void CancelPress()

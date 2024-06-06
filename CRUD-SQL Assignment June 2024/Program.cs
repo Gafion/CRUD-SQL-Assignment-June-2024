@@ -44,9 +44,9 @@ namespace CRUD_SQL_Assignment_June_2024
             Dimensions tableDim = new(
                     mainBoxDim.Width - Margins.MainBoxBorderMargin,
                     mainBoxDim.Height - Margins.TableBottomMargin);
-            List<string> headers = ["ID", "First Name", "Last Name", "Email", "Phone", "Address", "Title", "Delete", "Edit"];
+            List<string> headers = ["ID", "First Name", "Last Name", "Address", "City", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended", "Delete", "Edit"];
             List<User> users = userRepository.GetAllUsers();
-            Dictionary<int, int> columnAdjustments = new() { { 0, 4 }, { 7, 4 }, { 8, 4 } };
+            Dictionary<int, int> columnAdjustments = new() { { 0, 4 }, { 11, 4 }, { 12, 4 } };
             Table table = new(
                     pos: tablePos,
                     dim: tableDim,
@@ -68,17 +68,14 @@ namespace CRUD_SQL_Assignment_June_2024
                         pos: newUserDialogBoxPos,
                         align: Alignment.Center,
                         text: "Create New User",
-                        labelsInput: ["First Name", "Last Name", "Email", "Phone", "Address"],
-                        labelsComboBox: ["Title"],
-                        options: ["Dev", "DevOps", "Support", "UX", "CEO"]);
+                        labelsInput: ["First Name", "Last Name", "Address", "City", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended"]);
 
                 while (true)
                 {
                     var keyInfo = Console.ReadKey(true);
                 }
             }
-
-
+            NewUser();
 
 
 

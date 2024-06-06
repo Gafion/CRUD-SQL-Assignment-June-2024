@@ -78,10 +78,14 @@ namespace CRUD_SQL_Assignment_June_2024
                 user.Id.ToString(),
                 user.FirstName,
                 user.LastName,
-                user.EmailAddress,
-                user.PhoneNumber,
                 user.Address,
-                user.Title,
+                user.City,
+                user.PostCode,
+                user.Education,
+                user.EducationEnd,
+                user.Company,
+                user.Employed,
+                user.EmployEnd,
                 "Delete", // Placeholder for delete action
                 "Edit"    // Placeholder for edit action
             }).ToList();

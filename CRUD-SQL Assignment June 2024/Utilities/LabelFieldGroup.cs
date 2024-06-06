@@ -15,13 +15,12 @@ namespace CRUD_SQL_Assignment_June_2024
         private int ComboBoxes { get; }
         private Position? NextStartPos { get; set; }
 
-        public LabelFieldGroup(Position pos, Dimensions dim, int spacing, int inputFields, int comboBoxes, List<string>? labels = null) : base(pos, dim)
+        public LabelFieldGroup(Position pos, Dimensions dim, int spacing, int inputFields, List<string>? labels = null) : base(pos, dim)
         {
             this.StartPos = pos;
             this.FieldDim = dim;
             this.VerticalSpacing = spacing;
             this.InputFields = inputFields;
-            this.ComboBoxes = comboBoxes;
 
             if (labels != null)
             {

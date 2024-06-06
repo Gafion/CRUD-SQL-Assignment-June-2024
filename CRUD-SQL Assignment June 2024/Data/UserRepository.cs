@@ -12,7 +12,7 @@ namespace CRUD_SQL_Assignment_June_2024
 
         public UserRepository()
         {
-            AddUser("Christian", "Colberg", "kroll94@gmail.com", "60620466", "Hedelyparken 84 st th", "Dev");
+            AddUser("Christian", "Colberg", "Trønninge By 14", "Regstrup", "4420", "Datatekniker", "Current", "ZBC", "Feb 19 - 2024", "Current");
         }
 
         public List<User> GetAllUsers()
@@ -20,7 +20,7 @@ namespace CRUD_SQL_Assignment_June_2024
             return users;
         }
 
-        public void AddUser(string firstName, string lastName, string emailAddress, string phoneNumber, string address, string title)
+        public void AddUser(string firstName, string lastName, string address, string city, string postCode, string Education, string educationEnd, string company, string employed, string employEnd)
         {
             int newId = users.Count != 0 ? users.Max(u => u.Id) + 1 : 1;
             User newUser = new()
@@ -28,11 +28,15 @@ namespace CRUD_SQL_Assignment_June_2024
                 Id = newId,
                 FirstName = firstName,
                 LastName = lastName,
-                EmailAddress = emailAddress,
-                PhoneNumber = phoneNumber,
                 Address = address,
-                Title = title,
-            };
+                City = city,
+                PostCode = postCode,
+                Education = Education,
+                EducationEnd = educationEnd,
+                Company = company,
+                Employed = employed,
+                EmployEnd = employEnd
+    };
 
             users.Add(newUser);
         }
