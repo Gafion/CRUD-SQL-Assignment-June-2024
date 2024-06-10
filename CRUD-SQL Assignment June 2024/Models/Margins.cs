@@ -20,7 +20,7 @@ namespace CRUD_SQL_Assignment_June_2024
 
         // Dialog box dimensions
         public const int DialogBoxWidth = 56;
-        public const int DialogBoxHeight = 30;
+        public const int DialogBoxHeight = 45;
 
         // ComboBox dimensions
         public const int ComboBoxHeight = 1;

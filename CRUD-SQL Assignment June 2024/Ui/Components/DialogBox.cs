@@ -88,7 +88,10 @@ namespace CRUD_SQL_Assignment_June_2024
                 dim: inputFieldDim,
                 spacing: Margins.BorderVerticalMarginDouble,
                 labels: labelsInput);
-            Position nextStartPosInputFields = inputFields.GetNextStartPosition();
+
+
+
+            //Position nextStartPosInputFields = inputFields.GetNextStartPosition();
 
             // -- ComboBox Group
             /*Position comboBoxPos = new(
@@ -104,6 +107,7 @@ namespace CRUD_SQL_Assignment_June_2024
                 options: options,
                 spacing: Margins.BorderVerticalMarginDouble);
             Position nextStartPosComboBoxes = comboBoxes.GetNextStartPosition();*/
+
         }
 
         void CancelPress()

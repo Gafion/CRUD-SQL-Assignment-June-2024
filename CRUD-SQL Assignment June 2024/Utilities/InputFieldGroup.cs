@@ -45,6 +45,8 @@ namespace CRUD_SQL_Assignment_June_2024
                 currentPos = new Position(
                         currentPos.Left,
                         currentPos.Top + FieldDim.Height + VerticalSpacing);
+
+                
             }
             NextStartPos = currentPos;
         }
