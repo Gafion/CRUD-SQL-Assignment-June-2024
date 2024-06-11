@@ -36,5 +36,13 @@ namespace CRUD_SQL_Assignment_June_2024
                                 this.Pos.Top + Margins.BorderVerticalMarginSingle),
                 TextfieldDimensions, label, alignment, fgColor);
         }
+
+        public void Focus()
+        {
+            if (!isFocused)
+            {
+                isFocused = true;
+            }
+        }
     }
 }

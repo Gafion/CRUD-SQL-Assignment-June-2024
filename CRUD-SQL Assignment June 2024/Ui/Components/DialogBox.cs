@@ -9,9 +9,15 @@ namespace CRUD_SQL_Assignment_June_2024
 {
     internal class DialogBox : Box, IHasDimensions, IHasPosition
     {
+        private bool _continueLoop;
+        private int focusedFieldIndex = 0;
+        private InputFieldGroup inputFields; 
         public DialogBox(Dimensions dim, Position pos, Alignment? align, string text, List<string> labelsInput)
             : base(dim, pos)
         {
+            _continueLoop = true;
+            ConsoleKeyInfo keyInfo;
+
             // -- DialogBox Border
             _ = new Box(
                     dim,
@@ -90,7 +96,6 @@ namespace CRUD_SQL_Assignment_June_2024
                 labels: labelsInput);
 
 
-
             //Position nextStartPosInputFields = inputFields.GetNextStartPosition();
 
             // -- ComboBox Group
@@ -108,16 +113,55 @@ namespace CRUD_SQL_Assignment_June_2024
                 spacing: Margins.BorderVerticalMarginDouble);
             Position nextStartPosComboBoxes = comboBoxes.GetNextStartPosition();*/
 
+            acceptButton.Focus();
+            do
+            {
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    if (acceptButton)
+                    {
+                        AcceptPress();
+                    }
+                    else if (cancelButton)
+                    {
+                        CancelPress();
+                    }
+                }
+                else if (keyInfo.Key == ConsoleKey.LeftArrow)
+                {
+                    cancelButton.Focus();
+                }
+                else if (keyInfo.Key == ConsoleKey.RightArrow)
+                {
+                    acceptButton.Focus();
+                }
+            } while (true);
         }
 
         void CancelPress()
         {
+            _continueLoop = false;
+        }
 
+        public void AddUserFromInputs()
+        {
+            List<string> inputs = GetAllInputs();
+            if (inputs.Count == 10)
+            {
+                AddUser(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6], inputs[7], inputs[8], inputs[9]);
+            }
+            else
+            {
+                throw new ArgumentException("The number of inputs does not match the number of parameters required by AddUser.");
+            }
         }
 
         void AcceptPress()
         {
-
+            inputFields.CaptureAllInputs(); // Capture all inputs
+            AddUserFromInputs(); // Add user from captured inputs
+            _continueLoop = false; // Exit the loop
         }
     }
 }
