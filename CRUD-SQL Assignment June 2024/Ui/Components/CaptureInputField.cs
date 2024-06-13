@@ -26,7 +26,7 @@ namespace CRUD_SQL_Assignment_June_2024
 
         public void CaptureInput()
         {
-            if (!isFocused) return;
+            //if (!isFocused) return;
 
             Console.SetCursorPosition(FieldPos.Left, FieldPos.Top);
             Console.CursorVisible = true;
@@ -51,7 +51,7 @@ namespace CRUD_SQL_Assignment_June_2024
                         Console.Write(keyInfo.KeyChar);
                     }
                 }
-            } while (isFocused);
+            } while (true);
         }
 
         public void SetFocus()

@@ -39,7 +39,7 @@ namespace CRUD_SQL_Assignment_June_2024
                 CaptureInputField inputField = new(
                     pos: inputFieldPos,
                     dim: FieldDim,
-                    maxLength: FieldDim.Width - Margins.BorderHorizontalMarginSingle);
+                    maxLength: FieldDim.Width - Margins.BorderHorizontalMarginDouble);
                 InputFields.Add(inputField);
 
                 currentPos = new Position(

@@ -23,7 +23,7 @@ namespace CRUD_SQL_Assignment_June_2024
             DrawTable();
         }
 
-        private void DrawTable()
+        public void DrawTable()
         {
             DrawBorderTop();
             DrawHeaders();
@@ -174,6 +174,11 @@ namespace CRUD_SQL_Assignment_June_2024
                 Borders.Get(BorderPart.BottomLeft) + string.Join(Borders.Get(BorderPart.BottomMiddle),
                 ColumnWidths.Select(w => new string(Borders.Get(BorderPart.Horizontal), w))) + Borders.Get(BorderPart.BottomRight);
             InsertAt(bottomBorderPos, bottomBorder);
+        }
+
+        public void UpdateDataSource(List<User> newUsers)
+        {
+            this.Rows = ConvertUsersToRows(newUsers);
         }
     }
 }

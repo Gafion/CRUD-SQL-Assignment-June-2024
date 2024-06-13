@@ -9,13 +9,15 @@ namespace CRUD_SQL_Assignment_June_2024
 {
     internal class DialogBox : Box, IHasDimensions, IHasPosition
     {
-        private bool _continueLoop;
         private int focusedFieldIndex = 0;
         private InputFieldGroup inputFields; 
-        public DialogBox(Dimensions dim, Position pos, Alignment? align, string text, List<string> labelsInput)
+        private UserRepository userRepository;
+        private Table table;
+        public DialogBox(Dimensions dim, Position pos, Alignment? align, string text, List<string> labelsInput, UserRepository? userRepository = null, Table? table = null)
             : base(dim, pos)
         {
-            _continueLoop = true;
+            if(userRepository != null) this.userRepository = userRepository;
+            if(table != null) this.table = table;
             ConsoleKeyInfo keyInfo;
 
             // -- DialogBox Border
@@ -67,7 +69,6 @@ namespace CRUD_SQL_Assignment_June_2024
                 pos: cancelButtonPos,
                 dim: cancelButtonDim,
                 label: "Cancel",
-                action: CancelPress,
                 align: Alignment.Center);
 
             Position acceptButtonPos = new(
@@ -79,7 +80,6 @@ namespace CRUD_SQL_Assignment_June_2024
                 pos: acceptButtonPos,
                 dim: acceptButtonDim,
                 label: "Accept",
-                action: AcceptPress,
                 align: Alignment.Center);
 
             // -- Input Field Group
@@ -89,7 +89,8 @@ namespace CRUD_SQL_Assignment_June_2024
             Dimensions inputFieldDim = new(
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
-            InputFieldGroup inputFields = new(
+
+             inputFields = new(
                 pos: inputGroupStartPos,
                 dim: inputFieldDim,
                 spacing: Margins.BorderVerticalMarginDouble,
@@ -113,43 +114,52 @@ namespace CRUD_SQL_Assignment_June_2024
                 spacing: Margins.BorderVerticalMarginDouble);
             Position nextStartPosComboBoxes = comboBoxes.GetNextStartPosition();*/
 
-            acceptButton.Focus();
+            Console.CursorVisible = false;
+            acceptButton.FocusToggle(true);
+            acceptButton.DrawButton();
+
             do
             {
                 keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Enter)
                 {
-                    if (acceptButton)
+                    if (acceptButton.isFocused)
                     {
                         AcceptPress();
+                        return;
                     }
-                    else if (cancelButton)
+                    else if (cancelButton.isFocused)
                     {
                         CancelPress();
+                        return;
                     }
                 }
                 else if (keyInfo.Key == ConsoleKey.LeftArrow)
                 {
-                    cancelButton.Focus();
+                    acceptButton.FocusToggle(false);
+                    cancelButton.FocusToggle(true);
                 }
                 else if (keyInfo.Key == ConsoleKey.RightArrow)
                 {
-                    acceptButton.Focus();
+                    cancelButton.FocusToggle(false);
+                    acceptButton.FocusToggle(true);
                 }
             } while (true);
         }
 
         void CancelPress()
         {
-            _continueLoop = false;
+            ClearArea(Pos, Dim);
+            table.DrawTable();
         }
 
         public void AddUserFromInputs()
         {
-            List<string> inputs = GetAllInputs();
+            List<string> inputs = inputFields.GetAllInputs();
             if (inputs.Count == 10)
             {
-                AddUser(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6], inputs[7], inputs[8], inputs[9]);
+                Console.Title = inputs[1];
+                userRepository.AddUser(inputs[0], inputs[1], inputs[2], inputs[3], inputs[4], inputs[5], inputs[6], inputs[7], inputs[8], inputs[9]);
             }
             else
             {
@@ -159,9 +169,10 @@ namespace CRUD_SQL_Assignment_June_2024
 
         void AcceptPress()
         {
-            inputFields.CaptureAllInputs(); // Capture all inputs
             AddUserFromInputs(); // Add user from captured inputs
-            _continueLoop = false; // Exit the loop
+            table.UpdateDataSource(userRepository.GetAllUsers());
+            ClearArea(Pos, Dim);
+            table.DrawTable();
         }
     }
 }

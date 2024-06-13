@@ -8,15 +8,13 @@ namespace CRUD_SQL_Assignment_June_2024
 {
     internal class Button : Drawable, IHasPosition, IHasDimensions
     {
-        private bool isFocused = false;
+        public bool isFocused = false;
         private readonly string label;
         private readonly Alignment alignment;
-        private readonly Actions.ButtonAction ButtonAction;
 
-        public Button(Position pos, Dimensions dim, string label, Actions.ButtonAction action, Alignment align = Alignment.Center)
+        public Button(Position pos, Dimensions dim, string label, Alignment align = Alignment.Center)
             : base(pos, dim)
         {
-            this.ButtonAction = action;
             this.label = label;
             this.alignment = align;
             DrawButton();
@@ -37,12 +35,13 @@ namespace CRUD_SQL_Assignment_June_2024
                 TextfieldDimensions, label, alignment, fgColor);
         }
 
-        public void Focus()
+
+
+        public void FocusToggle(bool g)
         {
-            if (!isFocused)
-            {
-                isFocused = true;
-            }
+            isFocused = g;
+            DrawButton();
         }
+        
     }
 }

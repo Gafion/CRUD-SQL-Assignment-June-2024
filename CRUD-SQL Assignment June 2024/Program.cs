@@ -34,7 +34,6 @@ namespace CRUD_SQL_Assignment_June_2024
                     new Dimensions(
                         Margins.ButtonWidth, Margins.ButtonHeight),
                     label: "New User",
-                    action: NewUser,
                     align: Alignment.Center);
 
             // -- Main Table
@@ -55,7 +54,7 @@ namespace CRUD_SQL_Assignment_June_2024
                     columnAdjustments: columnAdjustments);
 
             // -- New User Window Popup
-            static void NewUser()
+            void NewUser()
             {
                 Dimensions newUserDialogBoxDim = new(
                         Margins.DialogBoxWidth,
@@ -68,14 +67,19 @@ namespace CRUD_SQL_Assignment_June_2024
                         pos: newUserDialogBoxPos,
                         align: Alignment.Center,
                         text: "Create New User",
-                        labelsInput: ["First Name", "Last Name", "Address", "City", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended"]);
+                        labelsInput: ["First Name", "Last Name", "Address", "City", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended"],
+                        userRepository: userRepository,
+                        table: table);
+            }
 
-                while (true)
-                {
-                    var keyInfo = Console.ReadKey(true);
+            while (true)
+            {
+                switch(Console.ReadKey().Key) {
+                    case ConsoleKey.Tab:
+                        NewUser();
+                        break;
                 }
             }
-            NewUser();
 
 
 
