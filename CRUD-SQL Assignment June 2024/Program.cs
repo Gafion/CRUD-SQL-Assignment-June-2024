@@ -4,11 +4,10 @@ namespace CRUD_SQL_Assignment_June_2024
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
-            UserRepository userRepository = new();
 
 
             // -- Main Window Border
@@ -27,14 +26,18 @@ namespace CRUD_SQL_Assignment_June_2024
                     FG: ConsoleColor.Magenta);
 
             // -- Main Window Button for creating new user
-            Button newUserButton = new(
-                    new Position(
+            Position newUserButtonPos = new(
                         MainBox.Pos.Left + Console.WindowWidth - Margins.ButtonWidth - Margins.BorderHorizontalMarginDouble,
-                        MainBox.Pos.Top + Margins.BorderVerticalMarginSingle),
-                    new Dimensions(
-                        Margins.ButtonWidth, Margins.ButtonHeight),
+                        MainBox.Pos.Top + Margins.BorderVerticalMarginSingle);
+            Dimensions newUserButtonDim = new(
+                        Margins.ButtonWidth,
+                        Margins.ButtonHeight);
+            Button newUserButton = new(
+                    pos: newUserButtonPos,
+                    dim: newUserButtonDim,
                     label: "New User",
-                    align: Alignment.Center);
+                    align: Alignment.Center,
+                    isFocused: true);
 
             // -- Main Table
             Position tablePos = new(
@@ -44,16 +47,31 @@ namespace CRUD_SQL_Assignment_June_2024
                     mainBoxDim.Width - Margins.MainBoxBorderMargin,
                     mainBoxDim.Height - Margins.TableBottomMargin);
             List<string> headers = ["ID", "First Name", "Last Name", "Address", "City", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended", "Delete", "Edit"];
-            List<User> users = userRepository.GetAllUsers();
             Dictionary<int, int> columnAdjustments = new() { { 0, 4 }, { 11, 4 }, { 12, 4 } };
             Table table = new(
                     pos: tablePos,
                     dim: tableDim,
                     headers: headers,
-                    users: users,
                     columnAdjustments: columnAdjustments);
 
             // -- New User Window Popup
+            /*void NewUser()
+            {
+                Dimensions newUserDialogBoxDim = new(
+                        Margins.DialogBoxWidth,
+                        Math.Min(Margins.DialogBoxHeight, Console.WindowHeight));
+                Position newUserDialogBoxPos = new(
+                            (Console.WindowWidth - Margins.DialogBoxWidth) / 2,
+                            (Console.WindowHeight - Math.Min(Margins.DialogBoxHeight, Console.WindowHeight)) / 2);
+                _ = new DialogBox(
+                        dim: newUserDialogBoxDim,
+                        pos: newUserDialogBoxPos,
+                        align: Alignment.Center,
+                        text: "Create New User",
+                        labelsInput: ["First Name", "Last Name", "Address", "Post code", "Education", "Education Ended", "Company", "Employed", "Employ Ended"],
+                        table: table);
+            }*/
+
             void NewUser()
             {
                 Dimensions newUserDialogBoxDim = new(
@@ -62,13 +80,11 @@ namespace CRUD_SQL_Assignment_June_2024
                 Position newUserDialogBoxPos = new(
                             (Console.WindowWidth - Margins.DialogBoxWidth) / 2,
                             (Console.WindowHeight - Math.Min(Margins.DialogBoxHeight, Console.WindowHeight)) / 2);
-                DialogBox newUserWindow = new(
+                _ = new DialogBoxCopy(
                         dim: newUserDialogBoxDim,
                         pos: newUserDialogBoxPos,
                         align: Alignment.Center,
                         text: "Create New User",
-                        labelsInput: ["First Name", "Last Name", "Address", "City", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended"],
-                        userRepository: userRepository,
                         table: table);
             }
 
@@ -76,7 +92,51 @@ namespace CRUD_SQL_Assignment_June_2024
             {
                 switch(Console.ReadKey().Key) {
                     case ConsoleKey.Tab:
-                        NewUser();
+                        if(!newUserButton.isFocused && table.isFocused)
+                        {
+                            newUserButton.isFocused = true;
+                            newUserButton.DrawButton();
+                            table.isFocused = false;
+                            table.DrawTable();
+                        }
+                        else if(newUserButton.isFocused && !table.isFocused)
+                        {
+                            newUserButton.isFocused = false;
+                            newUserButton.DrawButton();
+                            table.isFocused = true;
+                            table.DrawTable();
+                        }
+                        break;
+                    case ConsoleKey.LeftArrow:
+                    case ConsoleKey.RightArrow:
+                        if (table.isFocused)
+                        {
+                            table.ToggleActiveColumn();
+                        }
+                        break;
+                    case ConsoleKey.UpArrow:
+                        if (table.isFocused)
+                        {
+                            table.MoveActiveRowUp();
+                        }
+                        break;
+                    case ConsoleKey.DownArrow:
+                        if (table.isFocused)
+                        {
+                            table.MoveActiveRowDown();
+                        }
+                        break;
+                    case ConsoleKey.Enter:
+                        if(newUserButton.isFocused)
+                        {
+                            NewUser();
+                        }
+                        else if (table.isFocused && table.activeColumn == table.Headers.IndexOf("Delete"))
+                        {
+                            table.RemoveUser(table.GetActiveRowID());
+                            table.AdjustActiveRowAfterDeletion();
+                            table.DrawTable();
+                        }
                         break;
                 }
             }

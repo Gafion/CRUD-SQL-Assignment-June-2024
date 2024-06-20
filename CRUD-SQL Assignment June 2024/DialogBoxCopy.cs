@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 
 namespace CRUD_SQL_Assignment_June_2024
 {
-    internal class DialogBox : Box, IHasDimensions, IHasPosition
+    internal class DialogBoxCopy : Box, IHasDimensions, IHasPosition
     {
         private readonly InputFieldGroup inputFields;
+        private readonly InputFieldGroup inputFieldsEducationEnd;
+        private readonly InputFieldGroup inputFieldsEmploy;
         private readonly Table? table;
-        public DialogBox(Dimensions dim, Position pos, Alignment? align, string text, List<string> labelsInput, Table? table = null)
+        private readonly string postCode;
+        private readonly string company;
+        public DialogBoxCopy(Dimensions dim, Position pos, Alignment? align, string text, Table? table = null)
             : base(dim, pos)
         {
             if(table != null) this.table = table;
@@ -43,13 +47,12 @@ namespace CRUD_SQL_Assignment_June_2024
             Dimensions labelFieldDim = new(
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
-            List<string> combinedLabels = new(labelsInput);
             LabelFieldGroup labelFields = new(
                 pos: labelGroupStartPos,
                 dim: labelFieldDim,
                 spacing: Margins.BorderVerticalMarginDouble,
-                inputFields: labelsInput.Count,
-                labels: combinedLabels);
+                inputFields: 9,
+                labels: ["First Name", "Last Name", "Address", "Post code", "Education", "Education Ended", "Company", "Employed", "Ended"]);
             Position nextStartPosLabelFields = labelFields.GetNextStartPosition();
 
             // -- Accept and Cancel buttons
@@ -79,37 +82,90 @@ namespace CRUD_SQL_Assignment_June_2024
                 label: "Accept",
                 align: Alignment.Center);
 
-            // -- Input Field Group
+            List<object> fields = []; 
+
+            // -- Input Field for FirstName, LastName, Address
             Position inputGroupStartPos = new(
                     pos.Left + Margins.BorderHorizontalMarginDouble,
                     pos.Top + textFieldPosition.Top);
             Dimensions inputFieldDim = new(
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
-
              inputFields = new(
                 pos: inputGroupStartPos,
                 dim: inputFieldDim,
                 spacing: Margins.BorderVerticalMarginDouble,
-                labels: labelsInput);
+                labels: ["First Name", "Last Name", "Address"]);
+            Position nextStartPosInputFields1 = inputFields.GetNextStartPosition();
 
-
-            //Position nextStartPosInputFields = inputFields.GetNextStartPosition();
-
-            // -- ComboBox Group
-            /*Position comboBoxPos = new(
-                    nextStartPosInputFields.Left,
-                    nextStartPosInputFields.Top);
+            // -- ComboBox for PostCodes
+            Position comboBoxPos = new(
+                    nextStartPosInputFields1.Left + inputFieldDim.Width,
+                    nextStartPosInputFields1.Top - Margins.BorderVerticalMarginSingle);
             Dimensions comboBoxDim = new(
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
-            ComboBoxGroup comboBoxes = new(
+            ComboBox comboBoxPostCodes = new(
                 pos: comboBoxPos,
                 dim: comboBoxDim,
-                labels: labelsComboBox,
-                options: options,
-                spacing: Margins.BorderVerticalMarginDouble);
-            Position nextStartPosComboBoxes = comboBoxes.GetNextStartPosition();*/
+                options: Database.GetPostalCodes());
+            comboBoxPostCodes.CaptureInput();
+            postCode = comboBoxPostCodes.SelectedOption;
+
+            // -- ComboBox for Education
+            /*Position comboBoxPos2 = new(
+                    nextStartPosInputFields2.Left + inputFieldDim.Width,
+                    nextStartPosInputFields2.Top - Margins.BorderVerticalMarginSingle);
+            Dimensions comboBoxDim2 = new(
+                    Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
+                    Margins.ComboBoxHeight);
+            ComboBox comboBoxEducation = new(
+                pos: comboBoxPos2,
+                dim: comboBoxDim2,
+                options: Database.GetPostalCodes());
+            comboBoxPostCodes.CaptureInput();
+            postCode = comboBoxPostCodes.SelectedOption;*/
+
+            // -- Input Field for Education End
+            Position inputGroup2StartPos = new(
+                    nextStartPosInputFields1.Left,
+                    nextStartPosInputFields1.Top + Margins.ComboBoxHeight + Margins.BorderVerticalMarginDouble);
+            Dimensions inputField2Dim = new(
+                    Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
+                    Margins.ComboBoxHeight);
+            inputFieldsEducationEnd = new(
+               pos: inputGroup2StartPos,
+               dim: inputField2Dim,
+               spacing: Margins.BorderVerticalMarginDouble,
+               labels: ["Education End"]);
+            Position nextStartPosInputFields2 = inputFieldsEducationEnd.GetNextStartPosition();
+
+            // -- ComboBox for Companies
+            Position comboBoxCompanyPos = new(
+                    nextStartPosInputFields2.Left + inputFieldDim.Width,
+                    nextStartPosInputFields2.Top - Margins.BorderVerticalMarginSingle);
+            Dimensions comboBoxCompanyDim = new(
+                    Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
+                    Margins.ComboBoxHeight);
+            ComboBox comboBoxCompanies = new(
+                pos: comboBoxCompanyPos,
+                dim: comboBoxCompanyDim,
+                options: Database.GetCompanies());
+            comboBoxCompanies.CaptureInput();
+            company = comboBoxCompanies.SelectedOption;
+
+            // -- Input Field Group
+            Position inputGroup3StartPos = new(
+                    nextStartPosInputFields2.Left,
+                    nextStartPosInputFields2.Top + Margins.ComboBoxHeight + Margins.BorderVerticalMarginDouble);
+            Dimensions inputField3Dim = new(
+                    Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
+                    Margins.ComboBoxHeight);
+            inputFieldsEmploy = new(
+               pos: inputGroup3StartPos,
+               dim: inputField3Dim,
+               spacing: Margins.BorderVerticalMarginDouble,
+               labels: ["Employed", "Employ Ended"]);
 
             Console.CursorVisible = false;
             acceptButton.FocusToggle(true);
@@ -150,9 +206,27 @@ namespace CRUD_SQL_Assignment_June_2024
             table?.DrawTable();
         }
 
+        public List<string> GetAllInputs()
+        {
+            List<string> allInputs = new();
+
+            // Get inputs from the first input field group
+            allInputs.AddRange(inputFields.GetAllInputs());
+            // Insert the postCode string
+            allInputs.Insert(allInputs.Count, postCode);
+            // Get inputs from the education end input field
+            allInputs.AddRange(inputFieldsEducationEnd.GetAllInputs());
+            // Insert the Company string
+            allInputs.Insert(allInputs.Count, company);
+            // Get inputs from the employment input fields
+            allInputs.AddRange(inputFieldsEmploy.GetAllInputs());
+
+            return allInputs;
+        }
+
         public void AddUserFromInputs()
         {
-            List<string> inputs = inputFields.GetAllInputs();
+            List<string> inputs = GetAllInputs();
             
             List<List<string>> result = Database.Read1($"SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'person';", ["AUTO_INCREMENT"]);
             int personID = Int32.Parse(result[0][0] ?? "0");

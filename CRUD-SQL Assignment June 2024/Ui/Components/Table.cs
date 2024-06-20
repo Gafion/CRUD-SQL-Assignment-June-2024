@@ -1,30 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace CRUD_SQL_Assignment_June_2024
 {
     internal class Table : Drawable, IHasPosition, IHasDimensions
     {
-        private bool isFocused = false;
-        private List<string> Headers { get; set; }
+        public bool isFocused = false;
+        public List<string> Headers { get; set; }
         private List<List<string>> Rows { get; set; }
         private List<int> ColumnWidths { get; set; }
-        public Table(Position pos, Dimensions dim, List<string> headers, List<User> users, Dictionary<int, int>? columnAdjustments = null) : base(pos, dim)
+        public int activeRow;
+        public int activeColumn;
+        public Table(Position pos, Dimensions dim, List<string> headers, Dictionary<int, int>? columnAdjustments = null) : base(pos, dim)
         {
             this.Pos = pos;
             this.Dim = dim;
             this.Headers = headers;
-            this.Rows = ConvertUsersToRows(users);
+            this.Rows = [];
             this.ColumnWidths = CalculateColumnWidths(Headers, Rows, dim.Width, columnAdjustments ?? []);
+            activeRow = 0;
+            activeColumn = headers.IndexOf("Delete");
 
+            
             DrawTable();
+        }
+
+        private void LoadDataFromDatabase()
+        {
+            // Fetch data from the database
+            GetUsersFromDatabase();
+
+            // Convert users to rows
+            Rows = ConvertUsersToRows(UserRepository.users);
+
+            // Recalculate column widths
+            ColumnWidths = CalculateColumnWidths(Headers, Rows, Dim.Width, []);
+        }
+
+        private static void GetUsersFromDatabase()
+        {
+            UserRepository.users.Clear();
+            List<List<string>> result = Database.Read1("SELECT person.PersonId, person.FirstName, person.LastName, person.PostID, person.Address, city.City, " +
+                "course.CourseName, education.EducationEndDate, " +
+                "company.CompanyName, employment.Employed, employment.EmployEnd " +
+                "FROM person, city, education, employment, course, company " +
+                "WHERE city.PostID=person.PostID AND education.EducationID=person.PersonId " +
+                "AND employment.EmploymentID=person.PersonId AND course.CourseID=education.CourseID " +
+                "AND company.CompanyID=employment.CompanyID",
+                ["PersonID", "FirstName", "LastName", "Address", "City", "PostID", "CourseName", "EducationEndDate", "CompanyName", "Employed", "EmployEnd"]);
+            foreach (var u in result)
+            {
+                User user = new()
+                {
+                    Id = Int32.Parse(u[0]),
+                    FirstName = u[1],
+                    LastName = u[2],
+                    Address = u[3],
+                    City = u[4],
+                    PostCode = u[5],
+                    Education = u[6],
+                    EducationEnd = DateTime.Parse(u[7]).ToString("dd MMM yyyy", CultureInfo.InvariantCulture),
+                    Company = u[8],
+                    Employed = DateTime.Parse(u[9]).ToString("dd MMM yyyy", CultureInfo.InvariantCulture),
+                    EmployEnd = DateTime.Parse(u[10]).ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
+                };
+                    
+                UserRepository.users.Add(user);
+            }
         }
 
         public void DrawTable()
         {
+            LoadDataFromDatabase();
             DrawBorderTop();
             DrawHeaders();
             DrawHeadersBottom();
@@ -74,21 +126,21 @@ namespace CRUD_SQL_Assignment_June_2024
         private static List<List<string>> ConvertUsersToRows(List<User> users)
         {
             return users.Select(user => new List<string>
-            {
-                user.Id.ToString(),
-                user.FirstName,
-                user.LastName,
-                user.Address,
-                user.City,
-                user.PostCode,
-                user.Education,
-                user.EducationEnd,
-                user.Company,
-                user.Employed,
-                user.EmployEnd,
-                "Delete", // Placeholder for delete action
-                "Edit"    // Placeholder for edit action
-            }).ToList();
+        {
+            user.Id.ToString(),
+            user.FirstName,
+            user.LastName,
+            user.Address,
+            user.City,
+            user.PostCode,
+            user.Education,
+            user.EducationEnd,
+            user.Company,
+            user.Employed,
+            user.EmployEnd,
+            "Delete", // Placeholder for delete action
+            "Edit"    // Placeholder for edit action
+        }).ToList();
         }
 
         private void DrawBorderTop()
@@ -138,15 +190,15 @@ namespace CRUD_SQL_Assignment_June_2024
 
             for (int colIndex = 0; colIndex < Headers.Count; colIndex++)
             {
-                DrawCell(row, colIndex, cellLeftPosition, rowTopPosition);
+                DrawCell(row, colIndex, rowIndex, cellLeftPosition, rowTopPosition);
                 cellLeftPosition += ColumnWidths[colIndex] + 1;
             }
             InsertAt(new Position(cellLeftPosition, rowTopPosition), Borders.Get(BorderPart.Vertical).ToString());
         }
 
-        private void DrawCell(List<string> row, int colIndex, int cellLeftPosition, int rowTopPosition)
+        private void DrawCell(List<string> row, int colIndex, int rowIndex, int cellLeftPosition, int rowTopPosition)
         {
-            ConsoleColor fgColor = isFocused ? ConsoleColor.Red : ConsoleColor.Gray;
+            ConsoleColor fgColor = GetCellColor(rowIndex, colIndex);
 
             string cellContent = GetCellContent(row, colIndex).PadRight(ColumnWidths[colIndex]);
             Position cellContentPos = new(
@@ -162,6 +214,70 @@ namespace CRUD_SQL_Assignment_June_2024
         private static string GetCellContent(List<string> row, int colIndex)
         {
             return row.ElementAtOrDefault(colIndex) ?? "";
+        }
+
+        private ConsoleColor GetCellColor(int rowIndex, int colIndex)
+        {
+            if (isFocused && rowIndex == activeRow && colIndex == activeColumn)
+                return ConsoleColor.Red;
+
+            if (isFocused && rowIndex == activeRow && colIndex == 0)
+                return ConsoleColor.Red;
+
+            if (colIndex == 0 || colIndex >= 11)
+                return ConsoleColor.DarkGray;
+
+            return ConsoleColor.Gray;
+        }
+
+        private void RedrawCell(int rowIndex, int colIndex, ConsoleColor color)
+        {
+            int cellLeft = Pos.Left + Enumerable.Range(0, colIndex).Sum(i => ColumnWidths[i] + 1) + 1;
+            int cellTop = Pos.Top + 3 + rowIndex;
+            string cellContent = Rows[rowIndex][colIndex].PadRight(ColumnWidths[colIndex]);
+
+            Position cellPosition = new(cellLeft, cellTop);
+            Dimensions cellDimensions = new(ColumnWidths[colIndex], 1);
+            ClearArea(cellPosition, cellDimensions);
+            InsertAt(cellPosition, cellContent, color);
+        }
+
+        public void ToggleActiveColumn()
+        {
+            int previousActiveColumn = activeColumn;
+            activeColumn = (activeColumn == Headers.Count - 2) ? Headers.Count - 1 : Headers.Count - 2;
+            RedrawCell(activeRow, previousActiveColumn, ConsoleColor.DarkGray);
+            RedrawCell(activeRow, activeColumn, ConsoleColor.Red);
+        }
+
+        public void SetActiveRow(int index)
+        {
+            activeRow = index;
+            activeRow = Math.Max(0, Math.Min(activeRow, Rows.Count - 1));
+        }
+
+        private void UpdateActiveRow(int newRow)
+        {
+            RedrawCell(activeRow, activeColumn, ConsoleColor.DarkGray);
+            RedrawCell(activeRow, 0, ConsoleColor.DarkGray);
+            activeRow = newRow;
+            RedrawCell(activeRow, activeColumn, ConsoleColor.Red);
+            RedrawCell(activeRow, 0, ConsoleColor.Red);
+        }
+
+        public void MoveActiveRowUp()
+        {
+            if (activeRow > 0) UpdateActiveRow(activeRow - 1);
+        }
+
+        public void MoveActiveRowDown()
+        {
+            if (activeRow < Rows.Count - 1) UpdateActiveRow(activeRow + 1);
+        }
+
+        public void AdjustActiveRowAfterDeletion()
+        {
+            if (activeRow >= Rows.Count) activeRow = Math.Max(0, Rows.Count - 1);
         }
 
         private void DrawBorderBottom()
@@ -180,5 +296,24 @@ namespace CRUD_SQL_Assignment_June_2024
         {
             this.Rows = ConvertUsersToRows(newUsers);
         }
+
+        public int GetActiveRowID()
+        {
+            if (activeRow >= 0 && activeRow < Rows.Count)
+            {
+                return int.Parse(Rows[activeRow][0]);
+            }
+            else
+            {
+                throw new InvalidOperationException("No active row is selected or the active row index is out of range.");
+            }
+        }
+
+        public void RemoveUser(int id)
+        {
+            Database.RemoveUserWithID(id);
+            DrawTable();
+        }
+
     }
 }

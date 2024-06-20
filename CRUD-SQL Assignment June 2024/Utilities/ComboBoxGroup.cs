@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Protobuf.WellKnownTypes;
 
 namespace CRUD_SQL_Assignment_June_2024
 {
-    internal class ComboBoxGroup : Drawable
+    internal class ComboBoxGroup : ComboBox
     {
         private int VerticalSpacing { get; set; }
         private List<ComboBox> ComboBoxes { get; set; }
         private Position? NextStartPos { get; set; }
 
-        public ComboBoxGroup(Position pos, Dimensions dim, List<string> labels, List<string> options, int spacing) : base(pos, dim)
+        public ComboBoxGroup(Position pos, Dimensions dim, List<string> labels, List<string> options, int spacing) : base(pos, dim, options)
         {
             this.VerticalSpacing = spacing;
             this.ComboBoxes = [];
@@ -49,5 +50,7 @@ namespace CRUD_SQL_Assignment_June_2024
             NextStartPos = currentPos;
         }
         public Position GetNextStartPosition() => NextStartPos!;
+
+        
     }
 }

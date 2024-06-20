@@ -12,11 +12,12 @@ namespace CRUD_SQL_Assignment_June_2024
         private readonly string label;
         private readonly Alignment alignment;
 
-        public Button(Position pos, Dimensions dim, string label, Alignment align = Alignment.Center)
+        public Button(Position pos, Dimensions dim, string label, Alignment align = Alignment.Center, bool isFocused = false)
             : base(pos, dim)
         {
             this.label = label;
             this.alignment = align;
+            this.isFocused = isFocused;
             DrawButton();
         }
 
