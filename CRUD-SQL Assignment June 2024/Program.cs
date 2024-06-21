@@ -55,7 +55,7 @@ namespace CRUD_SQL_Assignment_June_2024
                     columnAdjustments: columnAdjustments);
 
             // -- New User Window Popup
-            /*void NewUser()
+            void NewUser()
             {
                 Dimensions newUserDialogBoxDim = new(
                         Margins.DialogBoxWidth,
@@ -70,9 +70,9 @@ namespace CRUD_SQL_Assignment_June_2024
                         text: "Create New User",
                         labelsInput: ["First Name", "Last Name", "Address", "Post code", "Education", "Education Ended", "Company", "Employed", "Employ Ended"],
                         table: table);
-            }*/
+            }
 
-            void NewUser()
+            /*void NewUser()
             {
                 Dimensions newUserDialogBoxDim = new(
                         Margins.DialogBoxWidth,
@@ -86,7 +86,7 @@ namespace CRUD_SQL_Assignment_June_2024
                         align: Alignment.Center,
                         text: "Create New User",
                         table: table);
-            }
+            }*/
 
             while (true)
             {

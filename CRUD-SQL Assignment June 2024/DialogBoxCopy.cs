@@ -14,6 +14,7 @@ namespace CRUD_SQL_Assignment_June_2024
         private readonly InputFieldGroup inputFieldsEmploy;
         private readonly Table? table;
         private readonly string postCode;
+        private readonly string education;
         private readonly string company;
         public DialogBoxCopy(Dimensions dim, Position pos, Alignment? align, string text, Table? table = null)
             : base(dim, pos)
@@ -113,9 +114,9 @@ namespace CRUD_SQL_Assignment_June_2024
             postCode = comboBoxPostCodes.SelectedOption;
 
             // -- ComboBox for Education
-            /*Position comboBoxPos2 = new(
-                    nextStartPosInputFields2.Left + inputFieldDim.Width,
-                    nextStartPosInputFields2.Top - Margins.BorderVerticalMarginSingle);
+            Position comboBoxPos2 = new(
+                    nextStartPosInputFields1.Left + inputFieldDim.Width,
+                    nextStartPosInputFields1.Top + Margins.ComboBoxHeight + Margins.BorderVerticalMarginDouble);
             Dimensions comboBoxDim2 = new(
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
@@ -123,13 +124,13 @@ namespace CRUD_SQL_Assignment_June_2024
                 pos: comboBoxPos2,
                 dim: comboBoxDim2,
                 options: Database.GetPostalCodes());
-            comboBoxPostCodes.CaptureInput();
-            postCode = comboBoxPostCodes.SelectedOption;*/
+            comboBoxEducation.CaptureInput();
+            education = comboBoxEducation.SelectedOption;
 
             // -- Input Field for Education End
             Position inputGroup2StartPos = new(
                     nextStartPosInputFields1.Left,
-                    nextStartPosInputFields1.Top + Margins.ComboBoxHeight + Margins.BorderVerticalMarginDouble);
+                    nextStartPosInputFields1.Top + (Margins.ComboBoxHeight * 2) + Margins.BorderVerticalMarginDouble);
             Dimensions inputField2Dim = new(
                     Margins.DialogBoxWidth / 2 - Margins.BorderHorizontalMarginDouble,
                     Margins.ComboBoxHeight);
@@ -214,6 +215,8 @@ namespace CRUD_SQL_Assignment_June_2024
             allInputs.AddRange(inputFields.GetAllInputs());
             // Insert the postCode string
             allInputs.Insert(allInputs.Count, postCode);
+            // Insert the Education string
+            allInputs.Insert(allInputs.Count, education);
             // Get inputs from the education end input field
             allInputs.AddRange(inputFieldsEducationEnd.GetAllInputs());
             // Insert the Company string
