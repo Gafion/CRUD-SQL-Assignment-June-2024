@@ -66,8 +66,8 @@ namespace CRUD_SQL_Assignment_June_2024
                 _ = new DialogBox(
                         dim: newUserDialogBoxDim,
                         pos: newUserDialogBoxPos,
-                        align: Alignment.Center,
-                        text: "Create New User",
+                        align: Alignment.Center, 
+                         text: "Create New User",
                         labelsInput: ["First Name", "Last Name", "Address", "Post code", "Education", "Education Ended", "Company", "Employed", "Employ Ended"],
                         table: table);
             }
